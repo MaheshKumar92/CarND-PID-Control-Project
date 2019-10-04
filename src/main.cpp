@@ -35,9 +35,14 @@ int main() {
 
   PID pid;
   /**
-   * TODO: Initialize the pid variable.
+   * Initialize the pid variable.
    */
-
+  // lets run with all coefficients set to zero
+  //pid.Init(0.0,0.0,0.0); // goes in a straight line
+  // run with only kp
+  // pid.Init(0.01,0.0,0.0); // it oscilates and oscilation increases with time. Kp = 1.0. If you decrease the value of Kp oscillation is reducing but car is not able to turn fast.
+  //pid.Init(0.15,0.0,2.0); // lets add kd (0.1, 0.0 and 0.5 works but there are some oscillations, that means kd needs to increase and truning is very slow that means kp increase)
+  pid.Init(0.17,0.00,3.0); 
   h.onMessage([&pid](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, 
                      uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
@@ -63,6 +68,8 @@ int main() {
            * NOTE: Feel free to play around with the throttle and speed.
            *   Maybe use another PID controller to control the speed!
            */
+          pid.UpdateError(cte);
+          steer_value = -pid.TotalError();
           
           // DEBUG
           std::cout << "CTE: " << cte << " Steering Value: " << steer_value 
